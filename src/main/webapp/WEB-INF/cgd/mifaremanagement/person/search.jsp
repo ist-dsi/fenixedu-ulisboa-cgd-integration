@@ -88,6 +88,7 @@ ${portal.toolkit()}
 
 <div class="panel panel-default">
 <form method="get" class="form-horizontal">
+${csrf.field()}
 <div class="panel-body">
 <div class="form-group row">
 <div class="col-sm-2 control-label"><spring:message code="label.Person.name"/></div> 

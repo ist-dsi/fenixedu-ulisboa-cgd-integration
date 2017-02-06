@@ -64,6 +64,7 @@ ${portal.toolkit()}
 
 <form id="deleteCgdForm"
 	method="POST">
+${csrf.field()}
 <input type="hidden" id="val"/>	
 </form>
 	
@@ -107,6 +108,7 @@ ${portal.toolkit()}
 	</div>
 	<div class="panel-body">
 <form method="post" class="form-horizontal">
+${csrf.field()}
 <table class="table">
 		<tbody>
 <tr>
