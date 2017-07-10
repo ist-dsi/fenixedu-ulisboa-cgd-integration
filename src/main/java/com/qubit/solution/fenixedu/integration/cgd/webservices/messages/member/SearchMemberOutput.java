@@ -54,30 +54,33 @@ public class SearchMemberOutput implements Serializable {
         //        boolean verifyMatch = CgdMessageUtils.verifyMatch(person, populationCode, memberCode, memberID);
         //         if (verifyMatch) {
         IMemberIDAdapter memberIDStrategy = CgdMessageUtils.getMemberIDStrategy();
-        if (person != null && memberIDStrategy.isAllowedAccessToMember(person)) {
+        if (person != null) {
             setReplyCode(CgdMessageUtils.REPLY_CODE_OPERATION_OK);
             List<SearchMemberOutputData> list = new ArrayList<SearchMemberOutputData>();
-            ExecutionYear readCurrentExecutionYear = ExecutionYear.readCurrentExecutionYear();
-            ExecutionYear previousYear = readCurrentExecutionYear.getPreviousExecutionYear();
-            if (person.getStudent() != null && !person.getStudent().getActiveRegistrations().isEmpty()) {
-                for (Registration registration : person.getStudent().getActiveRegistrations()) {
-                    if (!registration.getEnrolments(readCurrentExecutionYear).isEmpty()
-                            || !registration.getEnrolments(previousYear).isEmpty()) {
-                        list.add(SearchMemberOutputData.createStudentBased(memberIDStrategy, registration));
+
+            if (memberIDStrategy.isAllowedAccessToMember(person)) {
+                ExecutionYear readCurrentExecutionYear = ExecutionYear.readCurrentExecutionYear();
+                ExecutionYear previousYear = readCurrentExecutionYear.getPreviousExecutionYear();
+                if (person.getStudent() != null && !person.getStudent().getActiveRegistrations().isEmpty()) {
+                    for (Registration registration : person.getStudent().getActiveRegistrations()) {
+                        if (!registration.getEnrolments(readCurrentExecutionYear).isEmpty()
+                                || !registration.getEnrolments(previousYear).isEmpty()) {
+                            list.add(SearchMemberOutputData.createStudentBased(memberIDStrategy, registration));
+                        }
                     }
                 }
-            }
-            List<ExecutionSemester> semesters = new ArrayList<ExecutionSemester>();
-            semesters.addAll(readCurrentExecutionYear.getExecutionPeriodsSet());
-            semesters.addAll(previousYear.getExecutionPeriodsSet());
-            if (person.getTeacher() != null
-                    && person.getTeacher().getTeacherAuthorizationStream()
-                            .anyMatch(authorization -> semesters.contains(authorization.getExecutionSemester()))) {
-                list.add(SearchMemberOutputData.createTeacherBased(memberIDStrategy, person.getTeacher()));
-            }
+                List<ExecutionSemester> semesters = new ArrayList<ExecutionSemester>();
+                semesters.addAll(readCurrentExecutionYear.getExecutionPeriodsSet());
+                semesters.addAll(previousYear.getExecutionPeriodsSet());
+                if (person.getTeacher() != null
+                        && person.getTeacher().getTeacherAuthorizationStream()
+                                .anyMatch(authorization -> semesters.contains(authorization.getExecutionSemester()))) {
+                    list.add(SearchMemberOutputData.createTeacherBased(memberIDStrategy, person.getTeacher()));
+                }
 
-            if (Group.dynamic("employees").isMember(person.getUser())) {
-                list.add(SearchMemberOutputData.createEmployeeBased(memberIDStrategy, person));
+                if (Group.dynamic("employees").isMember(person.getUser())) {
+                    list.add(SearchMemberOutputData.createEmployeeBased(memberIDStrategy, person));
+                }
             }
 
             if (list.isEmpty()) {
@@ -89,7 +92,7 @@ public class SearchMemberOutput implements Serializable {
                 // 23 April 2015 - Paulo Abrantes
 
                 SearchMemberOutputData createDefault = SearchMemberOutputData.createDefault(memberIDStrategy, person);
-                if (!StringUtils.isEmpty(populationCode)) {
+                if (memberIDStrategy.isAllowedAccessToMember(person) && !StringUtils.isEmpty(populationCode)) {
                     final String memberId = memberIDStrategy.retrieveMemberID(person);
                     switch (populationCode.charAt(0)) {
                     case 'A':

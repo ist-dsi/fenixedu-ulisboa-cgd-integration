@@ -76,9 +76,9 @@ public class SearchMemberPhotoOuputMessage implements Serializable {
     public void populate(Person person, String populationCode, String memberCode, String memberID) {
         final IMemberIDAdapter strategy = CgdIntegrationConfiguration.getInstance().getMemberIDStrategy();
         boolean verifyMatch = CgdMessageUtils.verifyMatch(person, populationCode, memberCode, memberID);
-        if (verifyMatch && person != null && strategy.isAllowedAccessToMember(person)) {
+        if (verifyMatch && person != null) {
             Photograph personalPhoto = person.getPersonalPhoto();
-            if (personalPhoto == null) {
+            if (personalPhoto == null || !strategy.isAllowedAccessToMember(person)) {
                 setReplyCode(UNAVAILABLE_PHOTO);
                 setName(person.getName());
             } else {

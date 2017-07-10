@@ -149,7 +149,6 @@ public class SearchMemberInput implements Serializable {
         if (requestedPerson == null && !StringUtils.isEmpty(getMemberCode())) {
             requestedPerson = CgdMessageUtils.readPersonByMemberCode(getPopulationCode(), getMemberCode());
         }
-        final IMemberIDAdapter strategy = CgdIntegrationConfiguration.getInstance().getMemberIDStrategy();
-        return strategy.isAllowedAccessToMember(requestedPerson) ? requestedPerson : null;
+        return requestedPerson;
     }
 }

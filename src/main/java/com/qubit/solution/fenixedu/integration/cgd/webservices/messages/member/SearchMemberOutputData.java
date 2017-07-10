@@ -38,7 +38,6 @@ import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.TeacherCategory;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.core.domain.Bennu;
 
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
@@ -199,17 +198,20 @@ public class SearchMemberOutputData implements Serializable {
     }
 
     public static SearchMemberOutputData createDefault(IMemberIDAdapter strategy, Person person) {
+        final boolean allowedAccess = strategy.isAllowedAccessToMember(person);
 
         SearchMemberOutputData searchMemberOutputData = new SearchMemberOutputData();
         searchMemberOutputData.setMemberID(strategy.retrieveMemberID(person));
         searchMemberOutputData.setName(person.getName());
-        String socialSecurityNumber = person.getSocialSecurityNumber();
-        if (socialSecurityNumber != null) {
-            searchMemberOutputData.setFiscalCode(Long.valueOf(socialSecurityNumber));
+
+        if (allowedAccess) {
+            String socialSecurityNumber = person.getSocialSecurityNumber();
+            if (socialSecurityNumber != null) {
+                searchMemberOutputData.setFiscalCode(Long.valueOf(socialSecurityNumber));
+            }
         }
 
         Unit institutionUnit = Bennu.getInstance().getInstitutionUnit();
-
         searchMemberOutputData.setEstablishmentName(institutionUnit.getName());
         searchMemberOutputData.setEstablishmentCode(institutionUnit.getCode());
 
@@ -218,17 +220,16 @@ public class SearchMemberOutputData implements Serializable {
         List<ExecutionSemester> semesters = new ArrayList<ExecutionSemester>();
         semesters.addAll(readCurrentExecutionYear.getExecutionPeriodsSet());
         semesters.addAll(previousYear.getExecutionPeriodsSet());
-
-        String stayingIndicator =
-                (person.getStudent() != null && person.getStudent().hasActiveRegistrations())
-                        || (person.getTeacher() != null && person.getTeacher().getTeacherAuthorizationStream()
-                                .anyMatch(authorization -> semesters.contains(authorization.getExecutionSemester()))) ? "S" : "N";
+        
+        String stayingIndicator = (person.getStudent() != null && person.getStudent().hasActiveRegistrations())
+                || (person.getTeacher() != null && person.getTeacher().getTeacherAuthorizationStream()
+                .anyMatch(authorization -> semesters.contains(authorization.getExecutionSemester()))) ? "S" : "N";
         searchMemberOutputData.setStayingIndicator(stayingIndicator);
+
         return searchMemberOutputData;
     }
 
     public static SearchMemberOutputData createStudentBased(IMemberIDAdapter strategy, Registration registration) {
-        Student student = registration.getStudent();
         Person person = registration.getPerson();
 
         SearchMemberOutputData searchMemberOutputData = createDefault(strategy, person);

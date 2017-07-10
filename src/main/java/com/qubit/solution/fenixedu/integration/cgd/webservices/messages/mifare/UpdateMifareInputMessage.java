@@ -114,10 +114,7 @@ public class UpdateMifareInputMessage implements Serializable {
     }
 
     public Person getIdentifiedPerson() {
-        Person person = CgdMessageUtils.getMemberIDStrategy().readPerson(getMemberID());
-        if (person == null) {
-            person = CgdMessageUtils.readPersonByMemberCode(getPopulationCode(), getMemberCode());
-        }
-        return person;
+        final Person person = CgdMessageUtils.getMemberIDStrategy().readPerson(getMemberID());
+        return person == null ? CgdMessageUtils.readPersonByMemberCode(getPopulationCode(), getMemberCode()) : person;
     }
 }

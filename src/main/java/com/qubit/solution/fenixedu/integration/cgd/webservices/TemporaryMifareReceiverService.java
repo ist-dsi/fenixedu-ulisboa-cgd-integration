@@ -33,22 +33,19 @@ import org.fenixedu.academic.domain.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pt.ist.fenixframework.Atomic;
-
 import com.qubit.solution.fenixedu.bennu.webservices.services.server.BennuWebService;
 import com.qubit.solution.fenixedu.integration.cgd.domain.idcards.CgdCard;
-import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Sender;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.mifareReceiver.Response;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.mifareReceiver.Response.ErrorCode;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.mifareReceiver.Response.Status;
 
+import pt.ist.fenixframework.Atomic;
+
 @WebService
 public class TemporaryMifareReceiverService extends BennuWebService {
 
     private static Logger logger = LoggerFactory.getLogger(TemporaryMifareReceiverService.class);
-
-    private static String IES_CODE = null;
 
     @WebMethod
     public Response receiveMifare(String mifare, String memberNumber, String memberCategoryCode, String iesCode) {
