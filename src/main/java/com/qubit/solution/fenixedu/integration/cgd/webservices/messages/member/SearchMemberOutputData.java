@@ -205,8 +205,8 @@ public class SearchMemberOutputData implements Serializable {
         searchMemberOutputData.setName(person.getName());
 
         if (allowedAccess) {
-            String socialSecurityNumber = person.getSocialSecurityNumber();
-            if (socialSecurityNumber != null) {
+            String socialSecurityNumber = toVatNumber(person.getSocialSecurityNumber());
+            if (socialSecurityNumber != null && isVatValidForPT(socialSecurityNumber)) {
                 searchMemberOutputData.setFiscalCode(Long.valueOf(socialSecurityNumber));
             }
         }
@@ -227,6 +227,33 @@ public class SearchMemberOutputData implements Serializable {
         searchMemberOutputData.setStayingIndicator(stayingIndicator);
 
         return searchMemberOutputData;
+    }
+
+    private static boolean isVatValidForPT(final String vat) {
+        if (vat.length() != 9) {
+            return false;
+        }
+        for (int i = 0; i < 9; i++) {
+            if (!Character.isDigit(vat.charAt(i))) {
+                return false;
+            }
+        }
+        if (Integer.parseInt(vat) <= 0) {
+            return false;
+        }
+        int sum = 0;
+        for (int i = 0; i < 8; i++) {
+            final int c = Character.getNumericValue(vat.charAt(i));
+            sum += c * (9 - i);
+        }
+        final int controleDigit = Character.getNumericValue(vat.charAt(8));
+        final int remainder = sum % 11;
+        int digit = 11 - remainder;
+        return digit > 9 ? controleDigit == 0 : digit == controleDigit;
+    }
+
+    private static String toVatNumber(final String ssn) {
+        return ssn == null ? null : ssn.startsWith("PT") ? ssn.substring(2) : ssn;
     }
 
     public static SearchMemberOutputData createStudentBased(IMemberIDAdapter strategy, Registration registration) {
