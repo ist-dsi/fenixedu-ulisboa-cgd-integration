@@ -15,12 +15,33 @@
     <packaging>jar</packaging>
 
     <name>CGD Integration</name>
+    
+    <issueManagement>
+        <system>JIRA</system>
+        <url>https://jira.fenixedu.org/browse/FUCGD</url>
+    </issueManagement>
 
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License v3.0</name>
+            <url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:ist-dsi/fenixedu-ulisboa-cgd-integration.git</connection>
+        <developerConnection>scm:git:git@github.com:ist-dsi/fenixedu-ulisboa-cgd-integration.git</developerConnection>
+        <url>http://github.com/ist-dsi/fenixedu-ulisboa-cgd-integration</url>
+        <tag>HEAD</tag>
+    </scm>
+    
     <properties>
         <version.org.fenixedu.bennu>6.0.0</version.org.fenixedu.bennu>
         <version.org.fenixedu.academic>19.0.0</version.org.fenixedu.academic>
         <version.pt.ist.bennu-webservices-core>2.0.0</version.pt.ist.bennu-webservices-core>
     </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.fenixedu</groupId>
