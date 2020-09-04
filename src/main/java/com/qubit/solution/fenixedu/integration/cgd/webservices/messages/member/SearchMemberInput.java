@@ -26,17 +26,15 @@
  */
 package com.qubit.solution.fenixedu.integration.cgd.webservices.messages.member;
 
-import java.io.Serializable;
-import java.util.Collection;
-
+import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
+import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 
-import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
-import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
-import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
+import java.io.Serializable;
+import java.util.Collection;
 
 public class SearchMemberInput implements Serializable {
 
@@ -141,8 +139,10 @@ public class SearchMemberInput implements Serializable {
 
                 }
             } else if (documentType != null && documentType == TAXNUMBER_TYPE) {
-                Party party = requestedPerson.readByContributorNumber(documentID);
-                requestedPerson = (party instanceof Person) ? (Person) party : null;
+                requestedPerson = findByTaxNumber(documentID);
+                if (requestedPerson == null) {
+                    requestedPerson = findByTaxNumber("PT" + documentID);
+                }
             }
         }
 
@@ -151,4 +151,10 @@ public class SearchMemberInput implements Serializable {
         }
         return requestedPerson;
     }
+
+    private Person findByTaxNumber(final String taxNumber) {
+        final Party party = Party.readByContributorNumber(documentID);
+        return (party instanceof Person) ? (Person) party : null;
+    }
+
 }
