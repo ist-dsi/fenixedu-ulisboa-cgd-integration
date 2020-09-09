@@ -26,21 +26,23 @@
  */
 package com.qubit.solution.fenixedu.integration.cgd.webservices.messages.member;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.TeacherCategory;
+import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
+import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
+import org.fenixedu.academic.domain.phd.PhdProgram;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.bennu.core.domain.Bennu;
 
-import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SearchMemberOutputData implements Serializable {
 
@@ -272,6 +274,22 @@ public class SearchMemberOutputData implements Serializable {
             searchMemberOutputData.setDegreeDuration(degreeCurricularPlansForYear.iterator().next().getDurationInYears());
         }
         searchMemberOutputData.setDegreeType(registration.getDegree().getDegreeType().getName().getContent());
+
+        return searchMemberOutputData;
+    }
+
+    public static SearchMemberOutputData createStudentBased(IMemberIDAdapter strategy, PhdIndividualProgramProcess process) {
+        Person person = process.getPerson();
+
+        SearchMemberOutputData searchMemberOutputData = createDefault(strategy, person);
+        searchMemberOutputData.setPopulationCode("A");
+        final String memberId = strategy.retrieveMemberID(person);
+        searchMemberOutputData.setStudentNumber(String.valueOf(memberId));
+        searchMemberOutputData.setDegreeCode("9999");
+        final PhdProgram phdProgram = process.getPhdProgram();
+        searchMemberOutputData.setDegreeName(phdProgram.getName().getContent());
+        searchMemberOutputData.setCurricularYear(1);
+        searchMemberOutputData.setDegreeType(DegreeType.all().filter(t -> t.isThirdCycle()).findAny().orElse(null).getName().getContent());
 
         return searchMemberOutputData;
     }

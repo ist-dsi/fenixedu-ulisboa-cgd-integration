@@ -10,6 +10,7 @@ import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcessState;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 
@@ -69,6 +70,10 @@ public class SearchMemberOutput implements Serializable {
                         }
                     }
                 }
+                person.getPhdIndividualProgramProcessesSet().stream()
+                        .filter(program -> program.getMostRecentState() != null)
+                        .filter(program -> program.getMostRecentState().getType() == PhdIndividualProgramProcessState.WORK_DEVELOPMENT)
+                        .forEach(program -> list.add(SearchMemberOutputData.createStudentBased(memberIDStrategy, program)));
                 List<ExecutionSemester> semesters = new ArrayList<ExecutionSemester>();
                 semesters.addAll(readCurrentExecutionYear.getExecutionPeriodsSet());
                 semesters.addAll(previousYear.getExecutionPeriodsSet());
