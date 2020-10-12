@@ -152,8 +152,8 @@ public class SearchMemberInput implements Serializable {
         return requestedPerson;
     }
 
-    private Person findByTaxNumber(final String taxNumber) {
-        final Party party = Party.readByContributorNumber(documentID);
+    private static Person findByTaxNumber(final String taxNumber) {
+        final Party party = Party.readByContributorNumber(taxNumber);
         return (party instanceof Person) ? (Person) party : null;
     }
 
